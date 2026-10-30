@@ -1,0 +1,405 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>HEALM Prototipo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: una sola columna tipo celular, botones grandes, una acción por pantalla.
+   Color: cada pilar conserva su color en todas las pantallas para reconocerlo sin leer. */
+:root{
+  --bg:#EAF2F0; --surface:#FFFFFF; --ink:#10302D; --muted:#4A6662; --line:#CFE0DC;
+  --teal:#0B7A75; --orange:#C65A0A; --red:#C63B36; --blue:#2A60BD; --sun:#F2B52B; --sun-ink:#3A2A00;
+  --soft:#DCEBE8; --ok:#1F7A45; --bad:#B3342F;
+  --font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1A19; --surface:#162827; --ink:#E6F1EF; --muted:#9DB8B3; --line:#274240;
+    --soft:#1D3533; --sun:#F2B52B; --ok:#58C98A; --bad:#FF8A84; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1A19; --surface:#162827; --ink:#E6F1EF; --muted:#9DB8B3; --line:#274240;
+  --soft:#1D3533; --sun:#F2B52B; --ok:#58C98A; --bad:#FF8A84; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:18px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:460px;margin:0 auto;min-height:100dvh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:16px 28px;display:flex;flex-direction:column;gap:16px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;text-align:left}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.1;text-wrap:balance}
+
+.net{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:700;color:var(--ink)}
+.net svg{flex:none}
+.net .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.net span{min-width:0}
+
+.top{display:flex;align-items:center;gap:12px}
+.back{width:52px;height:52px;border-radius:16px;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center;flex:none}
+.top .crumb{font-family:var(--font-display);font-weight:700;font-size:20px;min-width:0}
+
+.hero{display:flex;flex-direction:column;gap:14px;padding-top:12px}
+.logo{font-family:var(--font-display);font-weight:800;font-size:64px;letter-spacing:.02em;color:var(--teal);line-height:1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo{color:#35C7BF}}
+:root[data-theme="dark"] .logo{color:#35C7BF}
+.hero p{margin:0;font-size:20px;color:var(--muted);font-weight:600}
+.big{display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;border-radius:20px;background:var(--sun);color:var(--sun-ink);font-family:var(--font-display);font-weight:800;font-size:24px;padding:12px 20px;text-align:center;width:100%}
+.big:active{transform:scale(.98)}
+.facts{display:grid;gap:10px;margin:6px 0 0;padding:0;list-style:none}
+.facts li{display:flex;gap:12px;align-items:center;font-weight:700;font-size:17px}
+.facts i{width:36px;height:36px;border-radius:12px;background:var(--soft);display:grid;place-items:center;flex:none}
+
+.greet{font-size:30px}
+.sub{margin:0;color:var(--muted);font-weight:600}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{aspect-ratio:1/1;border-radius:24px;color:#fff;padding:14px;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.tile:active{transform:scale(.97)}
+.tile svg{width:52px;height:52px}
+.tile b{font-family:var(--font-display);font-size:23px;line-height:1.05;font-weight:700}
+.tile small{display:block;font-family:var(--font-body);font-weight:700;font-size:13.5px;opacity:.92;margin-top:4px;line-height:1.2}
+.c-neg{background:var(--teal)} .c-her{background:var(--orange)} .c-sal{background:var(--red)} .c-dec{background:var(--blue)}
+
+.banner{border-radius:24px;color:#fff;padding:18px;display:flex;gap:14px;align-items:center}
+.banner svg{width:48px;height:48px;flex:none}
+.banner h2{font-size:28px}
+.list{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:14px;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:14px 16px;min-height:76px;width:100%}
+.row:active{transform:scale(.985)}
+.row .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none;color:#fff}
+.row .ic svg{width:28px;height:28px}
+.row b{font-family:var(--font-display);font-size:21px;line-height:1.1;display:block}
+.row small{display:block;color:var(--muted);font-weight:600;font-size:15px;margin-top:2px}
+.row .go{margin-left:auto;flex:none;color:var(--muted)}
+.row>div{min-width:0}
+
+.lead{font-size:21px;font-weight:700;margin:0}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.steps li{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:14px 16px}
+.steps .n{width:38px;height:38px;border-radius:50%;color:#fff;font-family:var(--font-display);font-weight:800;font-size:20px;display:grid;place-items:center;flex:none}
+.steps .t{min-width:0;font-weight:600;font-size:19px}
+.steps .t b{font-weight:800}
+.bullets li{align-items:center}
+.bullets .n{width:14px;height:14px;margin-top:6px;border-radius:50%}
+.tip{border-radius:20px;background:var(--soft);padding:14px 16px;font-weight:700;font-size:17px}
+.tip em{font-style:normal;font-family:var(--font-display);font-size:15px;letter-spacing:.06em;text-transform:uppercase;display:block;color:var(--muted);margin-bottom:2px}
+.help{border-radius:20px;border:2px dashed var(--bad);padding:12px 16px;font-weight:800;font-size:17px;color:var(--ink)}
+
+.ask h3{font-size:24px;margin-bottom:10px}
+.opts{display:grid;gap:10px}
+.opt{min-height:60px;border-radius:18px;border:2px solid var(--line);background:var(--surface);padding:12px 16px;font-weight:800;font-size:18px;display:flex;align-items:center;gap:12px}
+.opt .ck{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);flex:none}
+.opt[aria-pressed="true"]{border-color:var(--ok);background:var(--soft)}
+.opt[aria-pressed="true"] .ck{border-color:var(--ok);background:var(--ok)}
+.thanks{background:var(--soft);border-radius:20px;padding:14px 16px;font-weight:800}
+.ghost{min-height:56px;border-radius:18px;border:2px solid var(--line);background:var(--surface);font-weight:800;text-align:center;padding:10px 16px;width:100%;display:block}
+
+.foot{margin-top:auto;display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--muted);font-weight:700;padding-top:8px}
+.foot button{text-decoration:underline;font-weight:800;color:var(--muted);padding:6px 0}
+
+/* panel de prueba */
+.panel h2{font-size:28px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:14px 16px;display:grid;gap:10px}
+.card h3{font-size:20px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{border:2px solid var(--line);border-radius:14px;padding:10px 14px;font-weight:800;font-size:16px;min-height:46px;background:var(--surface);text-align:center}
+.seg button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums;min-width:380px}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--font-display);font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.crit{display:grid;gap:8px}
+.crit div{display:flex;justify-content:space-between;gap:12px;align-items:center;font-weight:700;font-size:16px}
+.pill{border-radius:999px;padding:3px 12px;font-weight:800;font-size:14px;white-space:nowrap}
+.pill.y{background:var(--ok);color:#fff} .pill.n{background:var(--bad);color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.y,:root:not([data-theme="light"]) .pill.n{color:#0D1A19}}
+:root[data-theme="dark"] .pill.y,:root[data-theme="dark"] .pill.n{color:#0D1A19}
+.pill.na{background:var(--soft);color:var(--muted)}
+.small{font-size:14px;color:var(--muted);font-weight:600;margin:0}
+textarea{width:100%;min-height:90px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:13px/1.4 ui-monospace,Menlo,monospace;padding:8px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}.big:active,.tile:active,.row:active{transform:none}}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ---------- Contenido (ejemplo para la prueba) ---------- */
+var ICONS = {
+  neg:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18l3-10h30l3 10"/><path d="M6 18c0 4 3 6 6 6s6-2 6-6c0 4 3 6 6 6s6-2 6-6c0 4 3 6 6 6s6-2 6-6"/><path d="M10 26v14h28V26"/><path d="M20 40V31h8v9"/></svg>',
+  her:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="9" width="32" height="22" rx="3"/><path d="M4 39h40"/><path d="M18 31l-2 8M30 31l2 8"/><path d="M16 20l5 4 11-9" /></svg>',
+  sal:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M24 41S6 30 6 18a9 9 0 0 1 18-3 9 9 0 0 1 18 3c0 12-18 23-18 23z"/><path d="M12 24h8l3-6 4 10 3-4h6"/></svg>',
+  dec:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M24 44V22"/><path d="M24 22l-12-8M24 22l12-8"/><path d="M6 14l6-6M6 14l6 6M42 14l-6-6M42 14l-6 6"/><path d="M24 22V6"/><path d="M20 10l4-4 4 4"/></svg>',
+  go:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  back:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  wifi:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a15 15 0 0 1 20 0"/><path d="M5.5 12.8a10 10 0 0 1 13 0"/><path d="M9 16.5a5 5 0 0 1 6 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>',
+  free:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4.5a2 2 0 0 1 0 3H10.5a2 2 0 0 0 0 3H15"/></svg>',
+  off:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M2 9a15 15 0 0 1 6-3.5M22 9a15 15 0 0 0-8-4M5.5 12.8a10 10 0 0 1 3-1.8M18.5 12.8a10 10 0 0 0-2.5-1.7"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>',
+  phone:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>'
+};
+
+var PILLARS = {
+  neg:{name:'Negocios', cls:'c-neg', color:'var(--teal)', hint:'Emprender, cobrar, vender', topics:[
+    {id:'neg-1', t:'Mi primer negocio en 4 pasos', d:'Empieza pequeño, sin deudas', lead:'Un negocio empieza con lo que ya sabes hacer.', kind:'steps', steps:[
+      '<b>Elige</b> algo que sepas hacer y que tus vecinos compren seguido: comida, reparaciones, ropa, cortes de cabello.',
+      '<b>Prueba pequeño.</b> Véndele a 5 personas conocidas antes de gastar en material grande.',
+      '<b>Anota todo:</b> lo que entra y lo que sale, aunque sea en una libreta.',
+      '<b>Reinvierte</b> una parte de lo ganado antes de gastarlo.'],
+      tip:'Si una persona te pagó una vez y regresó, tu idea funciona.'},
+    {id:'neg-2', t:'¿Cuánto cobrar?', d:'Que te quede ganancia', lead:'El precio cubre tres cosas: material, tu tiempo y ganancia.', kind:'steps', steps:[
+      '<b>Suma el material.</b> Ejemplo: 12 tamales te cuestan $120 en ingredientes.',
+      '<b>Pon valor a tu tiempo.</b> Si tu trabajo de esa tanda vale $60, el costo ya es $180.',
+      '<b>Agrega ganancia.</b> Vendes la docena arriba de $180 para que algo te quede.',
+      '<b>Compara</b> con lo que cobran en tu comunidad y ajusta.'],
+      tip:'Vender barato sin anotar los costos es la forma más común de perder dinero.'},
+    {id:'neg-3', t:'Dónde vender cerca de ti', d:'Tianguis, pedidos y vecinos', lead:'Tus primeros clientes están a pocas calles.', kind:'bullets', steps:[
+      'Tianguis o mercado de tu comunidad',
+      'Pedidos con tus vecinos y familiares',
+      'Tiendita de la esquina: deja tu producto a consignación',
+      'Escuela o taller: pregunta si puedes ofrecer ahí',
+      'Un letrero sencillo con tu nombre y cómo contactarte'],
+      tip:'Un cliente satisfecho que te recomienda vale más que un anuncio.'}
+  ]},
+  her:{name:'Herramientas digitales', cls:'c-her', color:'var(--orange)', hint:'Celular, correo y seguridad', topics:[
+    {id:'her-1', t:'Mi primer currículum', d:'Una hoja clara con tus datos', lead:'Una hoja ordenada abre más puertas que una larga.', kind:'steps', steps:[
+      '<b>Arriba:</b> tu nombre, teléfono y colonia o comunidad.',
+      '<b>Qué sabes hacer:</b> 3 o 4 cosas, aunque las hayas aprendido fuera de la escuela.',
+      '<b>Dónde has trabajado o ayudado:</b> también cuenta el negocio familiar.',
+      '<b>Estudios:</b> el último grado que cursaste o terminaste.'],
+      tip:'Pídele a alguien de confianza que lo lea antes de entregarlo.'},
+    {id:'her-2', t:'Llevar mis cuentas en el celular', d:'Anota lo que entra y sale', lead:'Una tabla sencilla te dice si tu negocio gana o pierde.', kind:'steps', steps:[
+      '<b>Abre</b> una hoja de cálculo o una nota con tres columnas: Fecha, Entró, Salió.',
+      '<b>Anota</b> cada venta y cada gasto el mismo día.',
+      '<b>Al final de la semana</b> suma las dos columnas.',
+      '<b>Resta:</b> lo que entró menos lo que salió es tu ganancia.'],
+      tip:'Anotar 5 minutos al día es mejor que intentar acordarte de todo el mes.'},
+    {id:'her-3', t:'Cuidarme de estafas en línea', d:'Contraseñas y mensajes falsos', lead:'Nadie serio te pide dinero ni claves por mensaje.', kind:'bullets', steps:[
+      'No compartas códigos que te lleguen por mensaje, ni con familiares ni con empresas',
+      '“Ganaste un premio” o “tu cuenta se bloqueó”: casi siempre es engaño',
+      'Usa una contraseña distinta para cada cuenta importante',
+      'Ofertas de trabajo que piden dinero por adelantado: no pagues',
+      'Si dudas, pregunta a alguien de confianza antes de dar datos'],
+      tip:'Si algo te urge demasiado, es señal para esperar y preguntar.'}
+  ]},
+  sal:{name:'Salud y nutrición', cls:'c-sal', color:'var(--red)', hint:'Comer bien, cuidarte, pedir ayuda', topics:[
+    {id:'sal-1', t:'Comer bien con lo que hay', d:'Guía de alimentación', lead:'Come variado y con lo que tienes cerca.', kind:'bullets', steps:[
+      '<b>Verduras y frutas (mucho):</b> nopales, zanahoria, calabaza, guayaba, plátano',
+      '<b>Proteínas (suficiente):</b> frijoles, lentejas, huevo, queso, pollo o pescado',
+      '<b>Cereales:</b> tortilla de maíz, avena, arroz',
+      '<b>Agua (diario):</b> unos 8 vasos; mejor que refrescos',
+      '<b>Menos:</b> refrescos, frituras y dulces diarios'],
+      tip:'Frijoles con tortilla y verduras forman una comida completa y barata.'},
+    {id:'sal-2', t:'Primeros auxilios básicos', d:'Qué hacer mientras llega ayuda', lead:'Mantén la calma. Si es grave, llama al 911.', kind:'bullets', steps:[
+      '<b>Quemadura:</b> agua fresca (no helada) de 10 a 20 minutos. No uses pasta dental ni aceite.',
+      '<b>Sangrado:</b> presiona con una tela limpia y no la retires si se empapa; pon otra encima.',
+      '<b>Desmayo:</b> acuéstalo, levanta sus piernas y revisa que respire.',
+      '<b>Atragantamiento:</b> si no puede hablar ni toser, pide ayuda y llama al 911.'],
+      tip:'Aprende el número 911 y dónde queda tu centro de salud.'},
+    {id:'sal-3', t:'Cuando me siento mal por dentro', d:'Bienestar emocional', lead:'Sentirte triste o sin ganas muchos días no es debilidad.', kind:'bullets', steps:[
+      'Habla con una persona de confianza: familiar, maestra, amigo',
+      'Duerme, come a tus horas y sal a caminar aunque sea poco',
+      'Si piensas en hacerte daño, pide ayuda ya: Línea de la Vida, 800 911 2000, gratis y todo el día',
+      'En tu centro de salud también pueden orientarte'],
+      tip:'Pedir ayuda a tiempo es de valientes.', help:'Si estás en peligro ahora, llama al 911.'}
+  ]},
+  dec:{name:'Decisiones de vida', cls:'c-dec', color:'var(--blue)', hint:'Estudiar, trabajar, tu futuro', topics:[
+    {id:'dec-1', t:'Seguir estudiando', d:'Opciones y apoyos', lead:'Dejar la escuela no es la única salida cuando hay problemas de dinero.', kind:'steps', steps:[
+      '<b>Pregunta en tu escuela</b> qué becas hay para continuar o pasar a bachillerato.',
+      '<b>Revisa opciones:</b> bachillerato técnico, abierto o en línea, para estudiar y trabajar.',
+      '<b>Junta los papeles</b> con tiempo: acta de nacimiento, CURP y comprobante de estudios.',
+      '<b>Pide acompañamiento</b> a un maestro o a tu orientadora.'],
+      tip:'Un certificado de bachillerato cambia mucho los trabajos a los que puedes entrar.'},
+    {id:'dec-2', t:'Mi proyecto de vida', d:'Dónde quiero estar en 5 años', lead:'Decidir con calma te cuida de decidir por presión.', kind:'steps', steps:[
+      '<b>Escribe</b> dónde te gustaría estar en 5 años: estudiando, trabajando, con tu negocio.',
+      '<b>Pon 3 pasos</b> pequeños para este año.',
+      '<b>Piensa en tiempos:</b> ser mamá o papá es una decisión tuya y puede planearse; en tu centro de salud te orientan gratis.',
+      '<b>Cuéntaselo</b> a una persona que te apoye.'],
+      tip:'Un plan en papel es más fuerte que una idea en la cabeza.'},
+    {id:'dec-3', t:'Trabajar sin que me abusen', d:'Conoce tus derechos', lead:'Tienes derechos desde tu primer empleo.', kind:'bullets', steps:[
+      'Pregunta sueldo, horario y funciones <b>antes</b> de empezar',
+      'No firmes hojas en blanco ni papeles que no entiendas',
+      'Pide copia de tu contrato o de lo que firmes',
+      'Un trabajo formal debe darte seguro social',
+      'Si eres menor de 18, hay límites de horas y tipo de trabajo; pregunta antes de aceptar',
+      'Nadie debe pedirte dinero para darte trabajo'],
+      tip:'Desconfía de ofertas que pagan mucho por poco esfuerzo.'}
+  ]}
+};
+var ORDER = ['neg','her','sal','dec'];
+var INTENTS = [
+  {v:'probar', t:'Lo voy a intentar'},
+  {v:'contar', t:'Se lo voy a contar a alguien'},
+  {v:'sabia',  t:'Ya lo sabía'},
+  {v:'nosirve',t:'No me sirve'}
+];
+
+/* ---------- Registro de uso (en este dispositivo) ---------- */
+function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var LOG = load('healm_log', []);
+var PID = load('healm_pid', 'P01');
+function rec(type, data){ var e={ts:Date.now(),pid:PID,type:type}; for(var k in (data||{})) e[k]=data[k]; LOG.push(e); save('healm_log',LOG); }
+
+/* ---------- Navegación ---------- */
+var app = document.getElementById('app');
+var stack = [], cur = null, intentChosen = null;
+function go(screen, id, pillar, back){
+  var now = Date.now();
+  if(cur && cur.screen!=='panel'){ rec('view',{screen:cur.screen,id:cur.id||null,pillar:cur.pillar||null,ms:now-cur.since}); }
+  if(cur && !back){ stack.push({screen:cur.screen,id:cur.id,pillar:cur.pillar}); }
+  cur = {screen:screen,id:id||null,pillar:pillar||null,since:now};
+  intentChosen = null;
+  render();
+  window.scrollTo(0,0);
+}
+function goBack(){
+  var p = stack.pop();
+  if(!p){ go('home',null,null,true); return; }
+  go(p.screen,p.id,p.pillar,true);
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+function netBar(){
+  return '<div class="net">'+ICONS.wifi+'<span>Conectado a HEALM-Aguascalientes</span><i class="dot"></i></div>';
+}
+function topBar(label){
+  return '<div class="top"><button class="back" data-act="back" aria-label="Regresar">'+ICONS.back+'</button><div class="crumb">'+esc(label)+'</div></div>';
+}
+
+function render(){
+  var s = cur.screen, h = '';
+  if(s==='welcome'){
+    h += netBar();
+    h += '<div class="hero"><div class="logo">HEALM</div><p>Tu red de apoyo, sin internet.</p>'+
+      '<ul class="facts">'+
+      '<li><i>'+ICONS.free+'</i>Gratis: no gasta saldo</li>'+
+      '<li><i>'+ICONS.off+'</i>No necesita internet ni datos</li>'+
+      '<li><i>'+ICONS.phone+'</i>Guías cortas para negocio, salud y futuro</li></ul></div>';
+    h += '<button class="big" data-act="enter">Entrar</button>';
+    h += '<div class="foot"><span>Prototipo de prueba</span><button data-act="panel">Modo prueba</button></div>';
+  }
+  else if(s==='home'){
+    h += netBar();
+    h += '<div><h1 class="greet">¿Qué quieres saber hoy?</h1><p class="sub">Toca un cuadro</p></div>';
+    h += '<div class="tiles">'+ORDER.map(function(k){var p=PILLARS[k];
+      return '<button class="tile '+p.cls+'" data-act="pillar" data-k="'+k+'">'+ICONS[k]+'<span><b>'+esc(p.name)+'</b><small>'+esc(p.hint)+'</small></span></button>'}).join('')+'</div>';
+    h += '<div class="foot"><span>Prototipo de prueba</span><button data-act="panel">Modo prueba</button></div>';
+  }
+  else if(s==='pillar'){
+    var p = PILLARS[cur.id];
+    h += topBar('Inicio');
+    h += '<div class="banner '+p.cls+'">'+ICONS[cur.id]+'<h2>'+esc(p.name)+'</h2></div>';
+    h += '<div class="list">'+p.topics.map(function(t){
+      return '<button class="row" data-act="topic" data-k="'+cur.id+'" data-id="'+t.id+'"><span class="ic" style="background:'+p.color+'">'+ICONS[cur.id]+'</span><div><b>'+esc(t.t)+'</b><small>'+esc(t.d)+'</small></div><span class="go">'+ICONS.go+'</span></button>'}).join('')+'</div>';
+  }
+  else if(s==='topic'){
+    var pp = PILLARS[cur.pillar], t = pp.topics.filter(function(x){return x.id===cur.id})[0];
+    h += topBar(pp.name);
+    h += '<h2 style="font-size:30px">'+esc(t.t)+'</h2>';
+    h += '<p class="lead">'+esc(t.lead)+'</p>';
+    h += '<ol class="steps '+(t.kind==='bullets'?'bullets':'')+'">'+t.steps.map(function(x,i){
+      return '<li><span class="n" style="background:'+pp.color+'">'+(t.kind==='bullets'?'':(i+1))+'</span><span class="t">'+x+'</span></li>'}).join('')+'</ol>';
+    h += '<div class="tip"><em>Recuerda</em>'+esc(t.tip)+'</div>';
+    if(t.help) h += '<div class="help">'+esc(t.help)+'</div>';
+    h += '<div class="ask"><h3>¿Qué harás con esto?</h3><div class="opts" id="opts">'+INTENTS.map(function(o){
+      return '<button class="opt" data-act="intent" data-v="'+o.v+'" aria-pressed="false"><span class="ck"></span>'+esc(o.t)+'</button>'}).join('')+'</div><div id="thanks"></div></div>';
+    h += '<button class="ghost" data-act="back">Ver otra guía</button>';
+  }
+  else if(s==='panel'){ h += panelHTML(); }
+  app.innerHTML = h;
+}
+
+/* ---------- Panel de prueba ---------- */
+function pids(){
+  var set = {}; LOG.forEach(function(e){set[e.pid]=1}); set[PID]=1;
+  return Object.keys(set).sort();
+}
+function stats(pid){
+  var ev = LOG.filter(function(e){return e.pid===pid});
+  var views = ev.filter(function(e){return e.type==='view' && e.screen==='topic'});
+  var topics = {}; views.forEach(function(v){topics[v.id]=1});
+  var ms = views.reduce(function(a,v){return a+(v.ms||0)},0);
+  var days = {}; ev.filter(function(e){return e.type==='enter'}).forEach(function(e){days[new Date(e.ts).toDateString()]=1});
+  var intents = ev.filter(function(e){return e.type==='intent'}).map(function(e){return e.v});
+  var ay = ev.filter(function(e){return e.type==='ayuda'}); var solo = ay.length ? ay[ay.length-1].v : null;
+  var entered = ev.some(function(e){return e.type==='enter'});
+  var concrete = intents.some(function(v){return v==='probar'||v==='contar'});
+  return {pid:pid, entered:entered, solo:solo, topics:Object.keys(topics).length, ms:ms, days:Object.keys(days).length, intents:intents, concrete:concrete};
+}
+function pill(ok){ return ok===null?'<span class="pill na">sin dato</span>':(ok?'<span class="pill y">Sí</span>':'<span class="pill n">No</span>'); }
+function fmt(ms){var s=Math.round(ms/1000);return s<60?s+' s':Math.floor(s/60)+' min '+(s%60)+' s'}
+function ratio(n,d){return d? (n+' de '+d+' ('+Math.round(100*n/d)+'%)') : 'sin participantes'}
+function panelHTML(){
+  var ids = pids(), all = ids.map(stats);
+  var N = all.length;
+  var entranSolo = all.filter(function(x){return x.solo==='si'}).length;
+  var obs = all.filter(function(x){return x.solo!==null}).length;
+  var segunda = all.filter(function(x){return x.topics>=2}).length;
+  var volvio = all.filter(function(x){return x.days>=2}).length;
+  var accion = all.filter(function(x){return x.concrete}).length;
+  var mine = stats(PID);
+  var h = '<div class="panel" style="display:grid;gap:16px">';
+  h += topBar('Volver al prototipo');
+  h += '<h2>Modo prueba</h2><p class="small">Los datos se guardan solo en este celular. Para juntar varios dispositivos, copia el registro de cada uno.</p>';
+  h += '<div class="card"><h3>Participante actual: '+esc(PID)+'</h3><div class="seg" id="pids">'+ids.map(function(i){return '<button data-act="setpid" data-id="'+i+'" aria-pressed="'+(i===PID)+'">'+i+'</button>'}).join('')+'<button data-act="newpid" aria-pressed="false">+ Nuevo</button></div>'+
+    '<h3 style="margin-top:6px">¿Entró sin ayuda?</h3><div class="seg"><button data-act="ayuda" data-v="si" aria-pressed="'+(mine.solo==='si')+'">Sí, solo</button><button data-act="ayuda" data-v="no" aria-pressed="'+(mine.solo==='no')+'">Necesitó ayuda</button></div>'+
+    '<p class="small">Marca esto observando, sin ayudar antes de que lo intente.</p></div>';
+  h += '<div class="card"><h3>Criterios de la suposición</h3><div class="crit">'+
+    '<div><span>Entran solos ≥ 60%<br><small class="small">'+ratio(entranSolo,obs)+'</small></span>'+pill(obs?entranSolo/obs>=0.6:null)+'</div>'+
+    '<div><span>Abren una 2.ª guía ≥ 50%<br><small class="small">'+ratio(segunda,N)+'</small></span>'+pill(N?segunda/N>=0.5:null)+'</div>'+
+    '<div><span>Regresan otro día ≥ 30%<br><small class="small">'+ratio(volvio,N)+'</small></span>'+pill(N?volvio/N>=0.3:null)+'</div>'+
+    '<div><span>Dicen una acción concreta<br><small class="small">'+ratio(accion,N)+'</small></span>'+pill(N?accion/N>=0.5:null)+'</div>'+
+    '</div></div>';
+  h += '<div class="card"><h3>Por participante</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>Solo</th><th>Guías</th><th>Tiempo</th><th>Días</th><th>Intención</th></tr></thead><tbody>'+
+    all.map(function(x){return '<tr><td>'+esc(x.pid)+'</td><td>'+(x.solo==='si'?'Sí':x.solo==='no'?'No':'–')+'</td><td>'+x.topics+'</td><td>'+fmt(x.ms)+'</td><td>'+x.days+'</td><td>'+(x.intents.length?esc(x.intents[x.intents.length-1]):'–')+'</td></tr>'}).join('')+
+    '</tbody></table></div></div>';
+  h += '<div class="card"><h3>Registro</h3><div class="seg"><button data-act="copy">Copiar registro</button><button data-act="reset" id="reset">Borrar todo</button></div><textarea id="out" readonly hidden></textarea><p class="small" id="msg"></p></div>';
+  h += '</div>';
+  return h;
+}
+
+/* ---------- Eventos ---------- */
+var resetArmed = false;
+app.addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-act]'); if(!b) return;
+  var a = b.getAttribute('data-act');
+  if(a==='enter'){ rec('enter'); go('home'); }
+  else if(a==='pillar'){ go('pillar', b.getAttribute('data-k')); }
+  else if(a==='topic'){ go('topic', b.getAttribute('data-id'), b.getAttribute('data-k')); }
+  else if(a==='back'){ goBack(); }
+  else if(a==='panel'){ go('panel'); }
+  else if(a==='intent'){
+    var v = b.getAttribute('data-v'); intentChosen = v;
+    rec('intent',{v:v, topic:cur.id});
+    var all = app.querySelectorAll('.opt'); for(var i=0;i<all.length;i++){ all[i].setAttribute('aria-pressed', all[i]===b?'true':'false'); }
+    document.getElementById('thanks').innerHTML = '<div class="thanks" style="margin-top:10px">Gracias. Puedes elegir otra guía.</div>';
+  }
+  else if(a==='setpid'){ PID=b.getAttribute('data-id'); save('healm_pid',PID); render(); }
+  else if(a==='newpid'){
+    var n=1, ex=pids(); while(ex.indexOf('P'+(n<10?'0'+n:n))>-1) n++;
+    PID='P'+(n<10?'0'+n:n); save('healm_pid',PID); render();
+  }
+  else if(a==='ayuda'){ rec('ayuda',{v:b.getAttribute('data-v')}); render(); }
+  else if(a==='copy'){
+    var out = document.getElementById('out'), msg = document.getElementById('msg');
+    var text = JSON.stringify(LOG);
+    out.value = text; out.hidden = false; out.focus(); out.select();
+    var done = function(){ msg.textContent='Registro copiado.'; };
+    try{ navigator.clipboard.writeText(text).then(done,function(){ msg.textContent='Selecciona el texto y cópialo.'; }); }
+    catch(e){ msg.textContent='Selecciona el texto y cópialo.'; }
+  }
+  else if(a==='reset'){
+    if(!resetArmed){ resetArmed=true; b.textContent='Toca otra vez para borrar'; return; }
+    resetArmed=false; LOG=[]; save('healm_log',LOG); PID='P01'; save('healm_pid',PID); render();
+  }
+});
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='hidden' && cur && cur.screen!=='panel'){ /* se cierra el conteo al volver a abrir */ } });
+
+go('welcome');
+</script>
+
+</body></html>
