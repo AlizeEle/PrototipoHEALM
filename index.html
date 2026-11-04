@@ -122,6 +122,25 @@ th{font-family:var(--font-display);font-size:14px;letter-spacing:.04em;text-tran
 .pill.na{background:var(--soft);color:var(--muted)}
 .small{font-size:14px;color:var(--muted);font-weight:600;margin:0}
 textarea{width:100%;min-height:90px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:13px/1.4 ui-monospace,Menlo,monospace;padding:8px}
+
+/* Ajuste a cualquier pantalla */
+.tile b{overflow-wrap:anywhere;hyphens:auto}
+@media (max-width:360px){
+  body{font-size:17px}
+  .logo{font-size:52px}
+  .greet,.tile b{font-size:19px}
+  .greet{font-size:26px}
+  .banner h2{font-size:22px}
+  .tile{padding:12px}
+  .tile svg{width:42px;height:42px}
+  .big{font-size:21px}
+}
+@media (min-width:520px){ .wrap{zoom:1.2} }
+@media (min-width:900px){
+  .wrap{zoom:1.45;padding-block:32px}
+  body{background:linear-gradient(180deg,var(--bg),var(--soft))}
+}
+@media (min-width:520px) and (max-height:700px){ .wrap{zoom:1} }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}.big:active,.tile:active,.row:active{transform:none}}
 </style>
 
